@@ -7,15 +7,16 @@ launch_lmcz_init: false
 client_request_timeout: "10s"   # Будет автоматически распарсено в time.Duration
 
 datamobile:
-  user: "tur"
-  pass: "q73wert89y"
+  user: "admin"
+  pass: ""
 
 apache:
-  publication_name: "tradeProfil11"
+  publication_name: "tradeProfilDm"
   # tradeProfilDm / polyMark
   address: "localhost"
   # 192.168.0.75 / localhost
   port: "8314"
+  # 8314
   conf_path: C:/Apache24/conf/httpd.conf
   # ssh drk@192.168.0.75 cd /etc/apache2/ apache2.conf // Путь к конфигурационному файлу Apache (для Windows или Linux)
   warning_duration: "2s"

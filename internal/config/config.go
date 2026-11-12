@@ -11,6 +11,9 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
+// DefaultFileName — имя файла конфигурации
+const DefaultFileName = "config.yaml"
+
 type ApacheConfig struct {
 	PublicationName string        `yaml:"publication_name"`
 	Address         string        `yaml:"address"`
@@ -49,7 +52,7 @@ type Config struct {
 // BaseURL собирает полный префикс адреса (включая протокол и порт) для HTTP-запросов.
 // Метод не нужно прописывать в YAML, он работает на основе существующих полей.
 func (a ApacheConfig) BaseURL() string {
-	// Ваша функция уберет http:// и красиво склеит хост с портом
+	// Функция уберет http:// и склеит хост с портом
 	cleanHostPort := urlutil.JoinHostPort(a.Address, a.Port)
 
 	// Возвращаем готовую строку, которую сразу поймет http.Client
@@ -59,20 +62,10 @@ func (a ApacheConfig) BaseURL() string {
 // New() парсит флаги и возвращает готовую конфигурацию.
 // Когда будем читать переменные окружения или .env файл, код поменяется только тут.
 func New() (*Config, error) {
-	// 1. Инициализируем пустую структуру
-	cfg := &Config{}
-
-	// 2. Читаем файл конфигурации
-	filename := "config.yaml"
-	fileBytes, err := os.ReadFile(filename)
+	// 1-3. Читаем и парсим файл конфигурации (теперь это делает Load)
+	cfg, err := Load(DefaultFileName)
 	if err != nil {
-		return nil, fmt.Errorf("не удалось прочитать файл конфигурации %s: %w", filename, err)
-	}
-
-	// 3. Парсим YAML в структуру.
-	// Библиотека yaml.v3 превращает строки вида "10s" или "5m" в тип time.Duration
-	if err := yaml.Unmarshal(fileBytes, cfg); err != nil {
-		return nil, fmt.Errorf("ошибка парсинга YAML: %w", err)
+		return nil, fmt.Errorf("ошибка чтения или парсинга YAML: %w", err)
 	}
 
 	// 4. Привязываем флаги командной строки к полям созданного объекта.
@@ -97,6 +90,28 @@ func New() (*Config, error) {
 
 	// Вызываем проверку проблем среды уже при создании конфига
 	cfg.validateEnvironment()
+
+	return cfg, nil
+}
+
+// [GUI-рефакторинг] только чтение и парсинг YAML,
+// Можно использовать и в CLI (через New),
+// и GUI (напрямую, с путем к config.yaml рядом с exe).
+func Load(filename string) (*Config, error) {
+	// 1. Инициализируем пустую структуру
+	cfg := &Config{}
+
+	// 2. Читаем файл конфигурации
+	fileBytes, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, fmt.Errorf("не удалось прочитать файл конфигурации %s: %w", filename, err)
+	}
+
+	// 3. Парсим YAML в структуру.
+	// Библиотека yaml.v3 превращает строки вида "10s" или "5m" в тип time.Duration
+	if err := yaml.Unmarshal(fileBytes, cfg); err != nil {
+		return nil, fmt.Errorf("ошибка парсинга YAML: %w", err)
+	}
 
 	return cfg, nil
 }
