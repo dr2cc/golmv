@@ -23,10 +23,10 @@ apache:
 
 lmcz:
   # Схемы не нужны!
-  host: "localhost"
+  host: ""
   # "localhost" "sidingkas"
-  subnet: "192.168.0"
-  port: "5998"
+  subnet: "192.168.4"
+  port: "5995"
   scanner_timeout: "500ms"
   user: "admin"
   pass: "admin"

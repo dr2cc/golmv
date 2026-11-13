@@ -41,6 +41,9 @@ func Run(cfg config.Config) error {
 		return dmClient.Check(ctx)
 	}
 
+	// ❗ golm --> golmv
+	// 13.11.26 Закончил сравнение на этом этапе
+	//
 	// Логика lm
 	// Эндпойнт /status
 	if cfg.LaunchLmczStatus {

@@ -150,10 +150,7 @@ func isWindowsConnRefused(err error) bool {
 }
 
 func (ds *DiagnosticSuite) checkLocalApache1C(ctx context.Context) error {
-	// Коротко и понятно, откуда берутся данные
-	addr := ds.apacheCfg.BaseURL()
-
-	if !strings.Contains(addr, "127.0.0.1") && !strings.Contains(addr, "localhost") {
+	if !ds.isLocalApache() {
 		return nil
 	}
 
@@ -161,6 +158,14 @@ func (ds *DiagnosticSuite) checkLocalApache1C(ctx context.Context) error {
 		return fmt.Errorf("local apache config module error: %w", err)
 	}
 	return nil
+}
+
+// isLocalApache — Apache запущен на этом же компьютере (тогда можно прочитать его httpd.conf).
+func (ds *DiagnosticSuite) isLocalApache() bool {
+	// Коротко и понятно, откуда берутся данные
+	addr := ds.apacheCfg.BaseURL()
+
+	return strings.Contains(addr, "127.0.0.1") || strings.Contains(addr, "localhost")
 }
 
 // Функция чтения версии модуля 1С из локального Apache
