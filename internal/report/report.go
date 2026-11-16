@@ -30,14 +30,16 @@ type Step struct {
 type Func func(Step)
 
 // Tracker хранит список шагов одной проверки и рассылает их изменения.
-// Все методы безопасно вызывать при emit == nil — тогда они ничего не делают.
+// Все методы безопасно вызывать, если функция отправки (emit) не задана (nil) — тогда они ничего не делают.
 type Tracker struct {
+	// emit (букв. испускать, излучать, порождать) — стандартный термин для событийных систем.
+	// здесь emit — это коллбэк-функция (Func), которая оповещает внешний интерфейс (окно) об изменении статуса шагов
 	emit Func
 	// срез из шагов
 	steps []Step
 }
 
-// NewTracker сразу сообщает весь план проверки (все шаги в состоянии Pending),
+// State = Pending NewTracker сразу сообщает весь план проверки (всем шагам здесь присваиваем статус "в ожидании" (Pending)),
 // чтобы окно показало список шагов еще до начала работы.
 func NewTracker(emit Func, steps ...Step) *Tracker {
 	t := &Tracker{emit: emit, steps: steps}
@@ -48,17 +50,18 @@ func NewTracker(emit Func, steps ...Step) *Tracker {
 	return t
 }
 
-// Start отмечает шаг как выполняющийся.
+// State = Running Start отмечает шаг как выполняющийся.
 func (t *Tracker) Start(id string) {
 	t.set(id, Running, "")
 }
 
-// Done завершает шаг с указанным состоянием и пояснением.
+// Done завершает шаг с указанным при его вызове состоянием и пояснением.
+// Сейчас вызывается с состояниями State = report.Fail и State = report.OK
 func (t *Tracker) Done(id string, state State, detail string) {
 	t.set(id, state, detail)
 }
 
-// SkipRest отмечает все еще не начатые шаги как пропущенные.
+// State = Skipped SkipRest отмечает все еще не начатые шаги как пропущенные.
 // Вызывается, когда проверка прервалась на одном из шагов.
 func (t *Tracker) SkipRest(detail string) {
 	for i := range t.steps {

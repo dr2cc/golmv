@@ -30,6 +30,7 @@ func (c *CzClient) findServer(steps *report.Tracker) (string, error) {
 	steps.Start(StepFind)
 	hostPort, err := c.resolveHostPort()
 	if err != nil {
+		// State = report.Fail
 		steps.Done(StepFind, report.Fail, err.Error())
 		steps.SkipRest("не выполнялся: сервер не найден")
 		return "", err
@@ -39,6 +40,7 @@ func (c *CzClient) findServer(steps *report.Tracker) (string, error) {
 	if c.cfg.Host == "" {
 		detail = hostPort + " (найден сканированием подсети)"
 	}
+	// State = report.OK
 	steps.Done(StepFind, report.OK, detail)
 	return hostPort, nil
 }
@@ -48,10 +50,12 @@ func (c *CzClient) queryStatus(ctx context.Context, steps *report.Tracker, hostP
 	steps.Start(StepStatus)
 	res, err := c.statusAt(ctx, hostPort)
 	if err != nil {
+		// State = report.Fail
 		steps.Done(StepStatus, report.Fail, err.Error())
 		steps.SkipRest("не выполнялся: статус не получен")
 		return res, err
 	}
+	// State = report.OK
 	steps.Done(StepStatus, report.OK, fmt.Sprintf("(%d) %s", res.HttpCode, res.Status))
 	return res, nil
 }

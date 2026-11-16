@@ -112,6 +112,11 @@ func (c *CzClient) sendToken(ctx context.Context, hostPort string) error {
 	return nil
 }
 
+// ❗ Этот метод при GUI-рефакторинге удаляют. Причина:
+// - при пустом Host он запускал ScanSubnet второй раз (сначала в Status, потом здесь);
+// - при заданном Host дублировал urlutil.JoinHostPort, но без порта по умолчанию.
+// Теперь Init получает адрес один раз через resolveHostPort() (см. status.go).
+//
 // Вспомогательный приватный метод, чтобы не дублировать логику склейки хоста и порта
 func (c *CzClient) getTargetHostPort() string {
 	if c.cfg.Host == "" {

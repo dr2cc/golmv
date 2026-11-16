@@ -41,9 +41,6 @@ func Run(cfg config.Config) error {
 		return dmClient.Check(ctx)
 	}
 
-	// ❗ golm --> golmv
-	// 13.11.26 Закончил сравнение на этом этапе
-	//
 	// Логика lm
 	// Эндпойнт /status
 	if cfg.LaunchLmczStatus {
@@ -57,6 +54,9 @@ func Run(cfg config.Config) error {
 		return nil
 	}
 
+	// ❗ golm --> golmv
+	// 16.11.26 Закончил сравнение на этом этапе
+	//
 	// Эндпойнт /init
 	if cfg.LaunchLmczInit {
 		log.Printf("Отправка токена для инициализации %s:%s...\n", cfg.LMCZ.Host, cfg.LMCZ.Port)

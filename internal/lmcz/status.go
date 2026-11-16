@@ -23,10 +23,11 @@ import (
 // [GUI-статусы] Части вызываются через обертки findServer / queryStatus (steps.go),
 // которые дополнительно сообщают GUI итог каждого шага. Результат и ошибки — прежние.
 func (c *CzClient) Status(ctx context.Context) (CheckResult, error) {
-	// ❗15.11.26 Здесь продолжить разбор [GUI-рефакторинга] - [GUI-статусы], Tracker struct.
-	// Как разберусь, сделать [GUI-статусы] (onStep получает изменения состояния шагов диагностики) в Логике dm
-	//
-	// (видимо) Здесь получаем "план" (tracker) проверки:
+	// Здесь создаем план (tracker) проверки. Он такой: find (поиск сервера) / status (получение статуса).
+	// В init.go план будет find / status / token (отправка токена).
+	// c.onStep==nil, так мы приравниваем nil ожидающий параметр emit
+	// emit— это коллбэк-функция (Func), которая оповещает внешний интерфейс (окно) об изменении статуса шагов
+	// В cli нам статусы не нужны (emit==nil)
 	steps := report.NewTracker(c.onStep, stepFind, stepStatus)
 
 	hostPort, err := c.findServer(steps)
